@@ -1,0 +1,8 @@
+.git
+.Rhistory
+.RData
+.Rproj.user
+*.ipynb_checkpoints
+outputs/*
+models/*
+visuals/*
