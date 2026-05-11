@@ -13,7 +13,6 @@ for (p in packages) {
 
 library(tidyverse)
 library(caret)
-library(glmnet)
 library(randomForest)
 library(e1071)
 library(rpart)
@@ -30,7 +29,7 @@ library(kernlab)
 ## ========================================================================
 
 
-df <- read.csv("data/Buy_Now_Pay_Later_BNPL_CreditRisk_Dataset.csv")
+data/Buy_Now_Pay_Later_BNPL_CreditRisk_Dataset.csv
 
 ## ========================================================================
 ## 3. Data Preparation
@@ -50,7 +49,7 @@ df <- df %>%
 df$default_flag <- as.character(df$default_flag)
 df$default_flag <- ifelse(df$default_flag %in% c("1","yes","Y","true","TRUE",1),
                           "default", "no_default")
-df$default_flag <- factor(df$default_flag, levels = c("default","no_default"))
+df$default_flag <- factor(df$default_flag, levels = c("no_default", "default"))
 
 ## ========================================================================
 ## 4. Exploratory Data Analysis (EDA)
@@ -108,12 +107,12 @@ test_scaled  <- predict(preProc, test %>% select(where(is.numeric)))
 ## ========================================================================
 
 # Linear Regression
-lm_model <- lm(risk_score ~ ., data = train)
+lm_model <- lm(risk_score ~ . - default_flag, data = train)
 lm_pred <- predict(lm_model, test)
 cat("Linear Regression RMSE:", RMSE(lm_pred, test$risk_score), "\n")
 
 # Random Forest
-rf_model <- randomForest(risk_score ~ ., data = train, ntree = 200)
+rf_model <- randomForest(risk_score ~ . - default_flag, data = train, ntree = 200)
 rf_pred <- predict(rf_model, test)
 cat("Random Forest RMSE:", RMSE(rf_pred, test$risk_score), "\n")
 
@@ -133,8 +132,8 @@ print(confusionMatrix(tree_pred, test$default_flag))
 log_model <- glm(default_flag ~ ., data = train, family = "binomial")
 
 prob_pred <- predict(log_model, test, type = "response")
-class_pred <- factor(ifelse(prob_pred > 0.5, "default", "no_default"),
-                     levels = c("default","no_default"))
+class_pred <- factor(ifelse(prob_pred > 0.5, "no_default", "default"),
+                     levels = c("default", "no_default"))
 cat("\nLogistic Regression (glm) Confusion Matrix:\n")
 print(confusionMatrix(class_pred, test$default_flag))
 
@@ -248,7 +247,8 @@ test$default_flag  <- factor(test$default_flag,  levels = c("default","no_defaul
 nn_model <- nnet(default_flag ~ ., data = train,
                  size = 5, maxit = 200, trace = FALSE)
 
-nn_prob <- as.numeric(predict(nn_model, test, type = "raw"))
+nn_raw <- predict(nn_model, test, type = "raw")
+nn_prob <- as.numeric(nn_raw[, "default"])
 nn_pred <- factor(ifelse(nn_prob > 0.5, "default", "no_default"),
                   levels = c("default","no_default"))
 
