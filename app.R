@@ -1,4 +1,3 @@
-jupyter nbconvert --to script app.ipynb
 
 ## ========================================================================
 ## 1. Install & Load Packages
