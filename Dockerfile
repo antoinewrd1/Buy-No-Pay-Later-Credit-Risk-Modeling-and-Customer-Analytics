@@ -1,6 +1,6 @@
 FROM rocker/r-ver:4.3.1
 
-WORKDIR /application
+WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
@@ -25,4 +25,4 @@ COPY . .
 
 RUN mkdir -p outputs models visuals
 
-CMD ["Rscript", "application.R"]
+CMD ["Rscript", "app.R"]
