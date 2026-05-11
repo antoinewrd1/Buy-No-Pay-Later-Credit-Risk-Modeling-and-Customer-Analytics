@@ -29,7 +29,7 @@ library(kernlab)
 ## ========================================================================
 
 
-data/Buy_Now_Pay_Later_BNPL_CreditRisk_Dataset.csv
+df <- read.csv("data/Buy_Now_Pay_Later_BNPL_CreditRisk_Dataset.csv")
 
 ## ========================================================================
 ## 3. Data Preparation
